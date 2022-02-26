@@ -174,6 +174,16 @@ func (c *Client) runWithPostFields(ctx context.Context, req *Request, resp inter
 		if _, err := io.Copy(part, req.files[i].R); err != nil {
 			return errors.Wrap(err, "preparing file")
 		}
+		// Write the map field for Monday
+		mapField, err := writer.CreateFormField("map")
+		if err != nil {
+			return errors.Wrap(err, "create map field")
+		}
+		if err := json.NewEncoder(mapField).Encode(map[string]interface{}{
+			req.files[i].Field: "variables.file",
+		}); err != nil {
+			return errors.Wrap(err, "encode map field")
+		}
 	}
 	if err := writer.Close(); err != nil {
 		return errors.Wrap(err, "close writer")
